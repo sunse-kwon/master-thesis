@@ -1,0 +1,61 @@
+---
+title: "autocorrelation analysis"
+author: "Sunse Kwon"
+date: '2022-11-20'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Import relevant packages
+```{r}
+require(nonlinearTseries)
+require(crqa)
+require(casnet)
+require(tseriesChaos)
+require(plot3D)
+require(scatterplot3d)
+require(rgl)
+require(ggplot2)
+require(Hmisc)
+
+# Turn off scientific notation
+options(scipen=999)
+```
+
+## Read dataset
+```{r}
+data <- read.csv('data_droped_nov18_dummy_final.csv')
+```
+
+
+## Subsetting individual parking lot
+```{r}
+carpark_sub <- data[data$carpark_number == 0,]
+```
+
+
+## Conduct autocorrelation analysis during EDA stage
+
+### Entire dataset (855 parking lots)
+```{r}
+tau.acf <- timeLag(data$lots_available, technique = "acf", lag.max = 100, do.plot = T)
+print(tau.acf)
+```
+with entire dataset, autocorrelation function returns the relevant timelag value is 1 (15 minute).
+
+### Individual level (single parking lot)
+```{r}
+carpark_sub.acf <- timeLag(carpark_sub$lots_available, technique = "acf", lag.max = 100, do.plot = T)
+print(carpark_sub.acf)
+```
+with single dataset, autocorrelation function returns the relevant timelag value is 16 (4 hour). 
+
+
+with this result, study tested 3 time window sizes specified below.
+
+* window 1 : used 1 previous timestep(15 minute) to predict next value in future.
+* window 2 : used 4 previous timesteps(1 hour) to predict next value in future.
+* window 3 : used 16 previous timesteps(4 hour) to predict next value in future.
